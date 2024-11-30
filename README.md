@@ -1,5 +1,7 @@
 # Lovebirds Ecosystem: DUSD & DUDU
 
+![Lovebirds World](./dusd-dashboard/public/lovebirds-world.png)
+
 The **Lovebirds Ecosystem** is a blockchain-based system inspired by the themes of love and freedom. It features two tokens: **DUSD**, a stablecoin representing love and freedom that DUDU seeks to protect, and **DUDU**, a meme utility token symbolizing the playful and vibrant nature of the Lovebirds family.
 
 ---
@@ -79,9 +81,12 @@ The **Lovebirds** theme unites DUSD and DUDU, embodying the harmony of stability
 
 ### Visual Design
 
-- **DUSD**: ![DUSD](./dusd-dashboard/public/DUSD.png)  
+- **DUSD**:  
+  <img src="./dusd-dashboard/public/DUSD-transparent.png" alt="DUSD" width="100" />  
   DUSD is the stablecoin in the ecosystem, symbolized by a calm and gentle Lovebird dedicated to protecting "love and freedom." Its design reflects the power of love and stability.
-- **DUDU**: ![DUDU](./dusd-dashboard/public/Duducoin.png)  
+
+- **DUDU**:  
+  <img src="./dusd-dashboard/public/Duducoin-transparent.png" alt="DUDU" width="100" />  
   DUDU represents a pair of lively and fun-loving Lovebirds, embodying the joy and vitality of love. This cheerful couple brings laughter to the community while playing a central role in the ecosystem's entertainment functions.
 
 ---
