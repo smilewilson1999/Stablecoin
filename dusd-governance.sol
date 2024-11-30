@@ -40,6 +40,7 @@ contract DUSDGovern is Ownable, ReentrancyGuard, AccessControl {
     uint256 private constant COL_PRICE_TO_WEI = 1e10;
     uint256 private constant WEI_VALUE = 1e18;
     uint256 public unstableColatAmount;
+    uint256 public marketcap;
     uint256 public unstableColPrice;
     uint256 public reserveCount;
 
@@ -73,8 +74,9 @@ contract DUSDGovern is Ownable, ReentrancyGuard, AccessControl {
     * Token price is calculated based on the marketcap of the token divided by the total supply
     * If the Duducoin (DUDU) was offically listed on an exchange, the price would be fetched from the oracle (price.oracle.sol)
     */
-    function setDUDUTokenPrice(uint256 marketcap) external nonReentrant {
+    function setDUDUTokenPrice(uint256 _marketcap) external nonReentrant {
         require(hasRole(GOVERN_ROLE, _msgSender()), "Not allowed");
+        marketcap = _marketcap;
         dudusupply = dudu.totalSupply();
         unstableColPrice = ((marketcap).mul(dudusupply)).div(WEI_VALUE);
     }
@@ -87,7 +89,7 @@ contract DUSDGovern is Ownable, ReentrancyGuard, AccessControl {
         if (stableBalance != stableColatAmount) {
             stableColatAmount = stableBalance;
         }
-        if (unstableBalance != stableColatAmount) {
+        if (unstableBalance != unstableColatAmount) {
             unstableColatAmount = unstableBalance;
         }
         return true;
@@ -106,27 +108,38 @@ contract DUSDGovern is Ownable, ReentrancyGuard, AccessControl {
     */
     function validatePeg() external nonReentrant {
         require(hasRole(GOVERN_ROLE, _msgSender()), "Not allowed");
+
         bool result = colateralReBalancing();
-        if (result = true) {
+        if (result) {
             uint256 rawcolvalue = (stableColatAmount.mul(WEI_VALUE)).add(unstableColatAmount.mul(unstableColPrice));
             uint256 colvalue = rawcolvalue.div(WEI_VALUE);
+
+            require(dusdsupply > 0, "dusdsupply is zero");
+
             if (colvalue < dusdsupply) {
                 uint256 supplyChange = dusdsupply.sub(colvalue);
+
+                require(unstableColPrice > 0, "unstableColPrice is zero");
                 uint256 burnAmount = (supplyChange.div(unstableColPrice)).mul(WEI_VALUE);
+
                 dudu.burn(burnAmount);
                 _supplyChanges[supplyChangeCount].method = "Burn";
                 _supplyChanges[supplyChangeCount].amount = supplyChange;
             }
+
             if (colvalue > dusdsupply) {
                 uint256 supplyChange = colvalue.sub(dusdsupply);
                 dudu.mint(supplyChange);
+
                 _supplyChanges[supplyChangeCount].method = "Mint";
                 _supplyChanges[supplyChangeCount].amount = supplyChange;
             }
-        _supplyChanges[supplyChangeCount].blocknum = block.number;
-        _supplyChanges[supplyChangeCount].timestamp = block.timestamp;
-        supplyChangeCount++;
-        emit RepegAction(block.timestamp, colvalue);
+
+            _supplyChanges[supplyChangeCount].blocknum = block.number;
+            _supplyChanges[supplyChangeCount].timestamp = block.timestamp;
+            supplyChangeCount++;
+
+            emit RepegAction(block.timestamp, colvalue);
         }
     }
 
